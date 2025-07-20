@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global Animation Fixes */
+* {
+  animation-play-state: running !important;
+}
+
+/* Ensure animations work on all browsers */
+@supports (animation: none) {
+  .animate-bounce {
+    animation: bounce 1s infinite !important;
+  }
+  
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+  }
+  
+  .animate-spin {
+    animation: spin 1s linear infinite !important;
+  }
+}
+
+/* Force hardware acceleration for better performance */
+.animate-bounce,
+.animate-pulse,
+.animate-spin,
+[class*="animate-"],
+[class*="bounce"],
+[class*="pulse"],
+[class*="glow"],
+[class*="float"],
+[class*="sparkle"] {
+  will-change: transform, opacity !important;
+  transform: translateZ(0) !important;
+  backface-visibility: hidden !important;
+}
+
+/* Ensure confetti animations work */
+.confetti-piece {
+  will-change: transform !important;
+  transform: translateZ(0) !important;
+  animation-play-state: running !important;
+}
+
+/* Ensure orb animations work */
+.dynamic-orb {
+  will-change: transform, opacity !important;
+  transform: translateZ(0) !important;
+  animation-play-state: running !important;
+}
+
+/* Global keyframes to ensure they work */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: .5;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
