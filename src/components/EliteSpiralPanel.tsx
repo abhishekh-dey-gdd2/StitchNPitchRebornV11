@@ -413,8 +413,6 @@ const EliteSpiralPanel: React.FC<EliteSpiralPanelProps> = ({ winners, eliteWinne
           />
         )}
 
-        {/* Elite Confetti Animation */}
-        <ConfettiAnimation isActive={showEliteConfetti} />
 
         {/* Elite Fail Animation */}
         <FailAnimation 
@@ -435,6 +433,17 @@ interface EliteWinnerDisplayProps {
 }
 
 const EliteWinnerDisplay: React.FC<EliteWinnerDisplayProps> = ({ eliteWinner, onBack }) => {
+  const [showConfetti, setShowConfetti] = React.useState(true);
+
+  React.useEffect(() => {
+    // Auto-stop confetti after 15 seconds for elite winners
+    const timer = setTimeout(() => {
+      setShowConfetti(false);
+    }, 15000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleModalClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
@@ -639,6 +648,9 @@ const EliteWinnerDisplay: React.FC<EliteWinnerDisplayProps> = ({ eliteWinner, on
           </button>
         </div>
       </div>
+      
+      {/* Elite Confetti Animation */}
+      <ConfettiAnimation isActive={showConfetti} intensity="heavy" duration={15} />
     </>
   );
 };

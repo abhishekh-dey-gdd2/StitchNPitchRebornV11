@@ -3,151 +3,169 @@ import React, { useEffect, useState } from 'react';
 interface ConfettiAnimationProps {
   isActive: boolean;
   intensity?: 'light' | 'medium' | 'heavy';
+  duration?: number; // in seconds, 0 means infinite
 }
 
 interface ConfettiPiece {
   id: number;
   x: number;
+  y: number;
   color: string;
   size: number;
-  delay: number;
-  duration: number;
+  speedX: number;
+  speedY: number;
+  rotation: number;
+  rotationSpeed: number;
   shape: 'circle' | 'square' | 'triangle';
 }
 
 const ConfettiAnimation: React.FC<ConfettiAnimationProps> = ({ 
   isActive, 
-  intensity = 'medium' 
+  intensity = 'medium',
+  duration = 0 // 0 means infinite
 }) => {
   const [confettiPieces, setConfettiPieces] = useState<ConfettiPiece[]>([]);
+  const [animationId, setAnimationId] = useState<number | null>(null);
 
   const colors = [
     '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
     '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
-    '#F8C471', '#82E0AA', '#F1948A', '#85C1E9', '#D7BDE2'
+    '#F8C471', '#82E0AA', '#F1948A', '#85C1E9', '#D7BDE2',
+    '#FFD700', '#FF69B4', '#00CED1', '#FF4500', '#9370DB'
   ];
 
   const intensityConfig = {
-    light: { count: 30, interval: 2000 },
-    medium: { count: 50, interval: 1500 },
-    heavy: { count: 80, interval: 1000 }
+    light: { count: 30, spawnRate: 3 },
+    medium: { count: 50, spawnRate: 5 },
+    heavy: { count: 80, spawnRate: 8 }
   };
 
-  const generateConfetti = () => {
-    const config = intensityConfig[intensity];
-    const pieces: ConfettiPiece[] = [];
-    
-    for (let i = 0; i < config.count; i++) {
-      pieces.push({
-        id: Math.random() * 10000,
-        x: Math.random() * 100,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        size: Math.random() * 8 + 4, // 4-12px
-        delay: Math.random() * 3,
-        duration: Math.random() * 3 + 3, // 3-6 seconds
-        shape: ['circle', 'square', 'triangle'][Math.floor(Math.random() * 3)] as 'circle' | 'square' | 'triangle'
-      });
-    }
-    
-    setConfettiPieces(pieces);
+  const createConfettiPiece = (id: number): ConfettiPiece => {
+    return {
+      id,
+      x: Math.random() * window.innerWidth,
+      y: -20,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      size: Math.random() * 8 + 4, // 4-12px
+      speedX: (Math.random() - 0.5) * 4, // -2 to 2
+      speedY: Math.random() * 3 + 2, // 2-5
+      rotation: Math.random() * 360,
+      rotationSpeed: (Math.random() - 0.5) * 10, // -5 to 5
+      shape: ['circle', 'square', 'triangle'][Math.floor(Math.random() * 3)] as 'circle' | 'square' | 'triangle'
+    };
+  };
+
+  const updateConfetti = () => {
+    setConfettiPieces(prevPieces => {
+      const updatedPieces = prevPieces
+        .map(piece => ({
+          ...piece,
+          x: piece.x + piece.speedX,
+          y: piece.y + piece.speedY,
+          rotation: piece.rotation + piece.rotationSpeed,
+          speedY: piece.speedY + 0.1 // gravity
+        }))
+        .filter(piece => piece.y < window.innerHeight + 50 && piece.x > -50 && piece.x < window.innerWidth + 50);
+
+      // Add new pieces if needed
+      const config = intensityConfig[intensity];
+      if (updatedPieces.length < config.count && isActive) {
+        const newPieces = [];
+        for (let i = 0; i < config.spawnRate; i++) {
+          newPieces.push(createConfettiPiece(Date.now() + i));
+        }
+        return [...updatedPieces, ...newPieces];
+      }
+
+      return updatedPieces;
+    });
   };
 
   useEffect(() => {
     if (!isActive) {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+        setAnimationId(null);
+      }
       setConfettiPieces([]);
       return;
     }
 
-    // Generate initial confetti
-    generateConfetti();
+    // Initialize confetti pieces
+    const config = intensityConfig[intensity];
+    const initialPieces = [];
+    for (let i = 0; i < config.count; i++) {
+      initialPieces.push(createConfettiPiece(i));
+    }
+    setConfettiPieces(initialPieces);
 
-    // Continuously generate new confetti
-    const interval = setInterval(() => {
-      if (isActive) {
-        generateConfetti();
+    // Start animation loop
+    const animate = () => {
+      updateConfetti();
+      const id = requestAnimationFrame(animate);
+      setAnimationId(id);
+    };
+
+    const id = requestAnimationFrame(animate);
+    setAnimationId(id);
+
+    // Auto-stop after duration if specified
+    let timeoutId: NodeJS.Timeout | null = null;
+    if (duration > 0) {
+      timeoutId = setTimeout(() => {
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+          setAnimationId(null);
+        }
+        setConfettiPieces([]);
+      }, duration * 1000);
+    }
+
+    return () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
       }
-    }, intensityConfig[intensity].interval);
-
-    return () => clearInterval(interval);
-  }, [isActive, intensity]);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isActive, intensity, duration]);
 
   if (!isActive || confettiPieces.length === 0) return null;
 
   return (
-    <>
-      <style>
-        {`
-          .confetti-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 9999;
-            overflow: hidden;
-          }
-          
-          .confetti-piece {
-            position: absolute;
-            top: -20px;
-            animation: confetti-fall linear infinite;
-            will-change: transform;
-          }
-          
-          .confetti-circle {
-            border-radius: 50%;
-          }
-          
-          .confetti-square {
-            border-radius: 0;
-          }
-          
-          .confetti-triangle {
-            width: 0 !important;
-            height: 0 !important;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-bottom: 10px solid;
-          }
-          
-          @keyframes confetti-fall {
-            0% {
-              transform: translateY(-20px) rotate(0deg);
-              opacity: 1;
-            }
-            10% {
-              opacity: 1;
-            }
-            90% {
-              opacity: 0.7;
-            }
-            100% {
-              transform: translateY(calc(100vh + 50px)) rotate(720deg);
-              opacity: 0;
-            }
-          }
-        `}
-      </style>
-      
-      <div className="confetti-container">
-        {confettiPieces.map((piece) => (
-          <div
-            key={piece.id}
-            className={`confetti-piece confetti-${piece.shape}`}
-            style={{
-              left: `${piece.x}%`,
-              width: piece.shape === 'triangle' ? '0' : `${piece.size}px`,
-              height: piece.shape === 'triangle' ? '0' : `${piece.size}px`,
-              backgroundColor: piece.shape === 'triangle' ? 'transparent' : piece.color,
-              borderBottomColor: piece.shape === 'triangle' ? piece.color : 'transparent',
-              animationDelay: `${piece.delay}s`,
-              animationDuration: `${piece.duration}s`
-            }}
-          />
-        ))}
-      </div>
-    </>
+    <div 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        pointerEvents: 'none',
+        zIndex: 9999,
+        overflow: 'hidden'
+      }}
+    >
+      {confettiPieces.map((piece) => (
+        <div
+          key={piece.id}
+          style={{
+            position: 'absolute',
+            left: `${piece.x}px`,
+            top: `${piece.y}px`,
+            width: piece.shape === 'triangle' ? '0' : `${piece.size}px`,
+            height: piece.shape === 'triangle' ? '0' : `${piece.size}px`,
+            backgroundColor: piece.shape === 'triangle' ? 'transparent' : piece.color,
+            borderLeft: piece.shape === 'triangle' ? `${piece.size/2}px solid transparent` : 'none',
+            borderRight: piece.shape === 'triangle' ? `${piece.size/2}px solid transparent` : 'none',
+            borderBottom: piece.shape === 'triangle' ? `${piece.size}px solid ${piece.color}` : 'none',
+            borderRadius: piece.shape === 'circle' ? '50%' : '0',
+            transform: `rotate(${piece.rotation}deg)`,
+            opacity: 0.9
+          }}
+        />
+      ))}
+    </div>
   );
 };
 

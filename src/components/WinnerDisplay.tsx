@@ -11,6 +11,15 @@ interface WinnerDisplayProps {
 const WinnerDisplay: React.FC<WinnerDisplayProps> = ({ winner, onBack }) => {
   const [showConfetti, setShowConfetti] = React.useState(true);
 
+  React.useEffect(() => {
+    // Auto-stop confetti after 10 seconds
+    const timer = setTimeout(() => {
+      setShowConfetti(false);
+    }, 10000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleModalClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
@@ -185,7 +194,7 @@ const WinnerDisplay: React.FC<WinnerDisplayProps> = ({ winner, onBack }) => {
       </div>
       
       {/* Confetti Animation */}
-      <ConfettiAnimation isActive={showConfetti} intensity="heavy" />
+      <ConfettiAnimation isActive={showConfetti} intensity="heavy" duration={10} />
     </>
   );
 };

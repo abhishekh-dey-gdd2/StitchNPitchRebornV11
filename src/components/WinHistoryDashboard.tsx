@@ -52,6 +52,7 @@ const WinHistoryDashboard: React.FC<WinHistoryDashboardProps> = ({
       };
     } else {
       setShowConfetti(false);
+      setAnimationPhase(0);
     }
   }, [isOpen]);
 
@@ -470,7 +471,7 @@ const WinHistoryDashboard: React.FC<WinHistoryDashboardProps> = ({
       </div>
 
       {/* Confetti Animation */}
-      <ConfettiAnimation isActive={showConfetti} />
+      <ConfettiAnimation isActive={showConfetti} intensity="medium" />
     </>
   );
 };

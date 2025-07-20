@@ -43,6 +43,7 @@ const EliteWinnersDashboard: React.FC<EliteWinnersDashboardProps> = ({ isOpen, o
       };
     } else {
       setShowConfetti(false);
+      setAnimationPhase(0);
     }
   }, [isOpen]);
 
@@ -477,7 +478,7 @@ const EliteWinnersDashboard: React.FC<EliteWinnersDashboardProps> = ({ isOpen, o
       </div>
 
       {/* Confetti Animation */}
-      <ConfettiAnimation isActive={showConfetti} />
+      <ConfettiAnimation isActive={showConfetti} intensity="heavy" />
     </>
   );
 };
