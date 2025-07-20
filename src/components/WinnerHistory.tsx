@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Trophy, Calendar, User, Building, UserCheck, Trash2, AlertTriangle, X, Filter, Users, Star, MessageCircle, Eye, EyeOff, Crown, ToggleLeft, ToggleRight } from 'lucide-react';
 import { Winner, EliteSpiral, DEPARTMENTS } from '../config/data';
-import ConfettiAnimation from './ConfettiAnimation';
 
 interface WinnerHistoryProps {
   winners: Winner[];

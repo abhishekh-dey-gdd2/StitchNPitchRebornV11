@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { PieChart as PieChartIcon, BarChart3, Calendar, Trophy, Users, X, Sparkles, Crown, ToggleLeft, ToggleRight, TrendingUp } from 'lucide-react';
 import { Winner, EliteSpiral, DEPARTMENTS } from '../config/data';
-import ConfettiAnimation from './ConfettiAnimation';
 
 interface WinHistoryDashboardProps {
   isOpen: boolean;
@@ -34,12 +33,10 @@ const WinHistoryDashboard: React.FC<WinHistoryDashboardProps> = ({
 }) => {
   const [activeChart, setActiveChart] = useState<'bar' | 'pie'>('bar');
   const [showEliteAnalytics, setShowEliteAnalytics] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
   const [animationPhase, setAnimationPhase] = useState(0);
 
   useEffect(() => {
     if (isOpen) {
-      setShowConfetti(true);
       // Animate charts in sequence
       const timer1 = setTimeout(() => setAnimationPhase(1), 500);
       const timer2 = setTimeout(() => setAnimationPhase(2), 1000);
@@ -51,7 +48,6 @@ const WinHistoryDashboard: React.FC<WinHistoryDashboardProps> = ({
         clearTimeout(timer3);
       };
     } else {
-      setShowConfetti(false);
       setAnimationPhase(0);
     }
   }, [isOpen]);
@@ -80,7 +76,6 @@ const WinHistoryDashboard: React.FC<WinHistoryDashboardProps> = ({
   };
 
   const handleClose = () => {
-    setShowConfetti(false);
     setAnimationPhase(0);
     onClose();
   };
@@ -469,9 +464,6 @@ const WinHistoryDashboard: React.FC<WinHistoryDashboardProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Confetti Animation */}
-      <ConfettiAnimation isActive={showConfetti} intensity="medium" />
     </>
   );
 };

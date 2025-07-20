@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend } from 'recharts';
 import { TrendingUp, PieChart as PieChartIcon, BarChart3, Calendar, Crown, Users, X, Sparkles } from 'lucide-react';
 import { EliteSpiral, DEPARTMENTS } from '../config/data';
-import ConfettiAnimation from './ConfettiAnimation';
 
 interface EliteWinnersDashboardProps {
   isOpen: boolean;
@@ -25,12 +24,10 @@ interface TimelineData {
 
 const EliteWinnersDashboard: React.FC<EliteWinnersDashboardProps> = ({ isOpen, onClose, eliteWinners }) => {
   const [activeChart, setActiveChart] = useState<'bar' | 'pie' | 'timeline'>('bar');
-  const [showConfetti, setShowConfetti] = useState(false);
   const [animationPhase, setAnimationPhase] = useState(0);
 
   useEffect(() => {
     if (isOpen) {
-      setShowConfetti(true);
       // Animate charts in sequence
       const timer1 = setTimeout(() => setAnimationPhase(1), 500);
       const timer2 = setTimeout(() => setAnimationPhase(2), 1000);
@@ -42,7 +39,6 @@ const EliteWinnersDashboard: React.FC<EliteWinnersDashboardProps> = ({ isOpen, o
         clearTimeout(timer3);
       };
     } else {
-      setShowConfetti(false);
       setAnimationPhase(0);
     }
   }, [isOpen]);
@@ -97,7 +93,6 @@ const EliteWinnersDashboard: React.FC<EliteWinnersDashboardProps> = ({ isOpen, o
   };
 
   const handleClose = () => {
-    setShowConfetti(false);
     setAnimationPhase(0);
     onClose();
   };
@@ -476,9 +471,6 @@ const EliteWinnersDashboard: React.FC<EliteWinnersDashboardProps> = ({ isOpen, o
           </div>
         </div>
       </div>
-
-      {/* Confetti Animation */}
-      <ConfettiAnimation isActive={showConfetti} intensity="heavy" />
     </>
   );
 };

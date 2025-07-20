@@ -3,7 +3,6 @@ import { Sparkles, Filter, Users, Star, Trophy, MessageCircle, Plus, Trash2, Shu
 import { Winner, EliteSpiral } from '../config/data';
 import { supabase } from '../lib/supabase';
 import PasswordModal from './PasswordModal';
-import ConfettiAnimation from './ConfettiAnimation';
 import FailAnimation from './FailAnimation';
 
 
@@ -22,7 +21,6 @@ const EliteSpiralPanel: React.FC<EliteSpiralPanelProps> = ({ winners, eliteWinne
   const [chatIds, setChatIds] = useState<string[]>(['']);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [currentEliteWinner, setCurrentEliteWinner] = useState<EliteSpiral | null>(null);
-  const [showEliteConfetti, setShowEliteConfetti] = useState(false);
   const [showEliteFailAnimation, setShowEliteFailAnimation] = useState(false);
   const [failedEliteName, setFailedEliteName] = useState('');
 
@@ -118,7 +116,6 @@ const EliteSpiralPanel: React.FC<EliteSpiralPanelProps> = ({ winners, eliteWinne
       
       // Show elite winner celebration
       setCurrentEliteWinner(eliteEntry);
-      setShowEliteConfetti(true);
       
       // Reset form
       setSelectedWinner(null);
@@ -135,7 +132,6 @@ const EliteSpiralPanel: React.FC<EliteSpiralPanelProps> = ({ winners, eliteWinne
   };
 
   const handleCloseEliteWinner = () => {
-    setShowEliteConfetti(false);
     setCurrentEliteWinner(null);
   };
 
@@ -433,17 +429,6 @@ interface EliteWinnerDisplayProps {
 }
 
 const EliteWinnerDisplay: React.FC<EliteWinnerDisplayProps> = ({ eliteWinner, onBack }) => {
-  const [showConfetti, setShowConfetti] = React.useState(true);
-
-  React.useEffect(() => {
-    // Auto-stop confetti after 15 seconds for elite winners
-    const timer = setTimeout(() => {
-      setShowConfetti(false);
-    }, 15000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   const handleModalClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
@@ -648,9 +633,6 @@ const EliteWinnerDisplay: React.FC<EliteWinnerDisplayProps> = ({ eliteWinner, on
           </button>
         </div>
       </div>
-      
-      {/* Elite Confetti Animation */}
-      <ConfettiAnimation isActive={showConfetti} intensity="heavy" duration={15} />
     </>
   );
 };
