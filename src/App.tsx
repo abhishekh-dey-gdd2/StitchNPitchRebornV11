@@ -14,7 +14,7 @@ import FailAnimation from './components/FailAnimation';
 import DynamicOrbs from './components/DynamicOrbs';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
-import ConfettiAnimation from './components/ConfettiAnimation';
+import ConfettiAnimation from './components/ConfettiAnimation.tsx';
 import { Guide, Winner, Loser, EliteSpiral } from './config/data';
 
 import './styles/responsive.css';
